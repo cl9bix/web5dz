@@ -3,18 +3,37 @@ import asyncio
 import datetime
 import json
 import sys
+from typing import List, Dict, Any, Optional
 
 
 class CurrencyRatesFetcher:
     API_URL = 'https://api.privatbank.ua/p24api/exchange_rates'
 
-    async def fetch_currency_rates(self, date):
+    async def fetch_currency_rates(self, date: str) -> Dict[str, Any]:
+        """
+        Отримує курси валют на певну дату.
+
+        Аргументи:
+            date (str): Дата, для якої потрібно отримати курси у форматі «РРРР-ММ-ДД».
+
+        Повернення:
+            Dict[str, Any]: словник, що містить курси валют на вказану дату.
+        """
         async with aiohttp.ClientSession() as session:
             params = {'json': '', 'date': date}
             async with session.get(self.API_URL, params=params) as response:
                 return await response.json()
 
-    def get_formatted_currency_rates(self, rates):
+    def get_formatted_currency_rates(self, rates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Форматує отримані курси валют.
+
+        Аргументи:
+            rates (List[Dict[str, Any]]): список словників, що містить отримані швидкості.
+
+        Повернення:
+            List[Dict[str, Any]]: список словників, що містять відформатовані швидкості.
+        """
         formatted_rates = []
         for rate in rates:
             date = rate['date']
@@ -34,7 +53,7 @@ class CurrencyRatesFetcher:
         return formatted_rates
 
 
-async def main():
+async def main() -> None:
     if len(sys.argv) != 2:
         print('Usage: python main.py <days>')
         return
